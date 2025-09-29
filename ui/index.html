@@ -113,23 +113,37 @@
                         <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm" x-text="memorySize"></span>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <!-- Loading Animation -->
+                    <div x-show="loadingMemory" class="text-center py-8 mb-6">
+                        <div class="inline-block">
+                            <svg class="animate-spin h-12 w-12 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                        <p class="text-gray-600 text-sm mt-3">
+                            <i class="fas fa-database mr-2 animate-pulse"></i>
+                            Chargement des données mémoire...
+                        </p>
+                    </div>
+
+                    <div x-show="!loadingMemory" x-transition class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="text-center p-4 bg-blue-50 rounded-lg transform hover:scale-105 transition-transform cursor-pointer">
                             <i class="fas fa-bug text-blue-600 text-2xl mb-2"></i>
                             <div class="font-bold text-lg" x-text="stats.errorPatterns"></div>
                             <div class="text-sm text-gray-600">Erreurs</div>
                         </div>
-                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                        <div class="text-center p-4 bg-green-50 rounded-lg transform hover:scale-105 transition-transform cursor-pointer">
                             <i class="fas fa-sitemap text-green-600 text-2xl mb-2"></i>
                             <div class="font-bold text-lg" x-text="stats.architectures"></div>
                             <div class="text-sm text-gray-600">Architectures</div>
                         </div>
-                        <div class="text-center p-4 bg-purple-50 rounded-lg">
+                        <div class="text-center p-4 bg-purple-50 rounded-lg transform hover:scale-105 transition-transform cursor-pointer">
                             <i class="fas fa-rocket text-purple-600 text-2xl mb-2"></i>
                             <div class="font-bold text-lg" x-text="stats.optimizations"></div>
                             <div class="text-sm text-gray-600">Optimisations</div>
                         </div>
-                        <div class="text-center p-4 bg-orange-50 rounded-lg">
+                        <div class="text-center p-4 bg-orange-50 rounded-lg transform hover:scale-105 transition-transform cursor-pointer">
                             <i class="fas fa-history text-orange-600 text-2xl mb-2"></i>
                             <div class="font-bold text-lg" x-text="stats.decisions"></div>
                             <div class="text-sm text-gray-600">Décisions</div>
