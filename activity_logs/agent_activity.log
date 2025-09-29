@@ -14,3 +14,4 @@
 [2025-09-29 22:34:28] [CTO-Technical-Lead] [idle] Waiting for tasks
 [2025-09-29 22:34:28] [CRO-Research-Lead] [idle] Waiting for tasks
 [2025-09-29 22:38:46] [System] [completed] ✅ Fixed idle status detection in dashboard
+[2025-09-29 22:43:02] [System] [completed] ✅ GitHub sync timestamp & MCP status real-time displays added

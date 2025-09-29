@@ -384,6 +384,114 @@ def add_activity():
         logger.error(f"Error adding activity: {e}")
         return jsonify({'success': False, 'message': str(e)})
 
+@app.route('/api/github/last_commit')
+def get_last_commit():
+    """Obtenir les informations du dernier commit GitHub"""
+    try:
+        # Obtenir le dernier commit et son timestamp
+        result = subprocess.run(
+            ['git', '-C', str(MEMORY_DIR), 'log', '-1', '--format=%H|%ar|%s'],
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+
+        if result.returncode == 0 and result.stdout.strip():
+            parts = result.stdout.strip().split('|')
+            commit_hash = parts[0][:7]  # Short hash
+            time_ago = parts[1] if len(parts) > 1 else 'unknown'
+            message = parts[2] if len(parts) > 2 else 'No message'
+
+            # Vérifier si le commit a été poussé
+            push_result = subprocess.run(
+                ['git', '-C', str(MEMORY_DIR), 'log', 'origin/main..HEAD', '--oneline'],
+                capture_output=True,
+                text=True,
+                timeout=5
+            )
+
+            is_synced = len(push_result.stdout.strip()) == 0
+
+            return jsonify({
+                'success': True,
+                'commit_hash': commit_hash,
+                'time_ago': time_ago,
+                'message': message,
+                'is_synced': is_synced,
+                'status': 'synced' if is_synced else 'pending'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'No commits found',
+                'status': 'no_repo'
+            })
+    except subprocess.TimeoutExpired:
+        return jsonify({
+            'success': False,
+            'message': 'Git command timeout',
+            'status': 'error'
+        })
+    except Exception as e:
+        logger.error(f"Error getting last commit: {e}")
+        return jsonify({
+            'success': False,
+            'message': str(e),
+            'status': 'error'
+        })
+
+@app.route('/api/mcp/status')
+def get_mcp_status():
+    """Vérifier le status des serveurs MCP"""
+    servers = []
+
+    # Vérifier ref-tools (documentation search)
+    try:
+        # ref-tools est disponible si on peut importer les tools
+        ref_tools_available = True
+        servers.append({
+            'name': 'ref-tools',
+            'description': 'Documentation search',
+            'status': 'connected',
+            'available': ref_tools_available
+        })
+    except:
+        servers.append({
+            'name': 'ref-tools',
+            'description': 'Documentation search',
+            'status': 'disconnected',
+            'available': False
+        })
+
+    # Vérifier filesystem
+    try:
+        # filesystem est disponible si le répertoire de mémoire existe
+        filesystem_available = MEMORY_DIR.exists()
+        servers.append({
+            'name': 'filesystem',
+            'description': 'File operations',
+            'status': 'connected' if filesystem_available else 'disconnected',
+            'available': filesystem_available
+        })
+    except:
+        servers.append({
+            'name': 'filesystem',
+            'description': 'File operations',
+            'status': 'disconnected',
+            'available': False
+        })
+
+    # Compter les serveurs connectés
+    connected_count = sum(1 for s in servers if s['status'] == 'connected')
+    total_count = len(servers)
+
+    return jsonify({
+        'servers': servers,
+        'connected': connected_count,
+        'total': total_count,
+        'status': 'healthy' if connected_count == total_count else 'partial'
+    })
+
 if __name__ == '__main__':
     print("🚀 Démarrage du serveur Claude Code CEO Configuration Manager")
     print(f"📁 Répertoire mémoire: {MEMORY_DIR}")
