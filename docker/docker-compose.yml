@@ -1,0 +1,158 @@
+# Claude Code CEO - Professional Configuration Manager
+# Docker Compose pour déploiement one-click
+
+version: '3.8'
+
+services:
+  claude-code-ceo:
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    container_name: claude-code-ceo
+    image: ehadsagency-ai/claude-code-ceo:latest
+
+    # Configuration réseau
+    ports:
+      - "5000:5000"
+
+    # Variables d'environnement
+    environment:
+      - GITHUB_USER=ehadsagency-ai
+      - GITHUB_EMAIL=ehads.agency@gmail.com
+      - GITHUB_REPO=claude-code-memory
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - AUTO_SYNC=${AUTO_SYNC:-true}
+      - DEBUG_MODE=${DEBUG_MODE:-false}
+      - FLASK_ENV=production
+
+    # Volumes pour persistance des données
+    volumes:
+      # Mémoire globale persistante
+      - claude_memory:/app/.claude/global_memory
+      # Logs persistants
+      - claude_logs:/app/logs
+      # Configuration Claude (optionnel, pour override)
+      - ./claude_config:/app/.claude/config:ro
+
+    # Configuration réseau
+    networks:
+      - claude-network
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+    # Limites de ressources
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+    # Labels pour identification
+    labels:
+      - "com.ehadsagency.app=claude-code-ceo"
+      - "com.ehadsagency.version=1.0.0"
+      - "com.ehadsagency.description=Claude Code CEO Professional Manager"
+
+  # Service optionnel: Reverse Proxy (Nginx)
+  nginx:
+    image: nginx:alpine
+    container_name: claude-code-nginx
+    profiles:
+      - proxy
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+
+    depends_on:
+      claude-code-ceo:
+        condition: service_healthy
+
+    networks:
+      - claude-network
+
+    restart: unless-stopped
+
+    labels:
+      - "com.ehadsagency.app=claude-code-nginx"
+      - "com.ehadsagency.service=reverse-proxy"
+
+  # Service optionnel: Monitoring (Prometheus)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: claude-code-monitoring
+    profiles:
+      - monitoring
+
+    ports:
+      - "9090:9090"
+
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+
+    networks:
+      - claude-network
+
+    restart: unless-stopped
+
+# Configuration des réseaux
+networks:
+  claude-network:
+    driver: bridge
+    labels:
+      - "com.ehadsagency.network=claude-code-internal"
+
+# Configuration des volumes
+volumes:
+  # Volume principal pour la mémoire globale
+  claude_memory:
+    driver: local
+    labels:
+      - "com.ehadsagency.volume=claude-memory"
+      - "com.ehadsagency.type=persistent-data"
+
+  # Volume pour les logs
+  claude_logs:
+    driver: local
+    labels:
+      - "com.ehadsagency.volume=claude-logs"
+      - "com.ehadsagency.type=logging"
+
+  # Volume pour Nginx logs (si proxy activé)
+  nginx_logs:
+    driver: local
+
+  # Volume pour Prometheus data (si monitoring activé)
+  prometheus_data:
+    driver: local
+
+# Configuration des secrets (pour production)
+secrets:
+  github_token:
+    external: true
+    labels:
+      - "com.ehadsagency.secret=github-token"
