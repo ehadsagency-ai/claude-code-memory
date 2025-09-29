@@ -420,6 +420,7 @@
 
                 agents: [],
                 activityLog: [],
+                loadingMemory: true,
 
                 message: {
                     text: '',
@@ -473,13 +474,20 @@
                 },
 
                 async loadMemoryStats() {
+                    this.loadingMemory = true;
                     try {
                         const response = await fetch('/api/memory/stats');
                         const stats = await response.json();
+
+                        // Simulate loading time for smooth animation (minimum 500ms)
+                        await new Promise(resolve => setTimeout(resolve, 500));
+
                         this.stats = stats;
                         this.stats.totalSize = stats.totalSize || this.memorySize;
+                        this.loadingMemory = false;
                     } catch (error) {
                         console.error('Erreur de chargement des statistiques:', error);
+                        this.loadingMemory = false;
                     }
                 },
 
