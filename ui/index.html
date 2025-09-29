@@ -647,6 +647,7 @@
                     for (let i = this.activityLog.length - 1; i >= 0; i--) {
                         const activity = this.activityLog[i];
                         if (activity.includes(`[${agentName}]`)) {
+                            if (activity.includes('[idle]')) return 'idle';
                             if (activity.includes('[planning]')) return 'planning';
                             if (activity.includes('[active]')) return 'active';
                             if (activity.includes('[working]')) return 'working';
