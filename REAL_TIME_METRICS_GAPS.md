@@ -126,9 +126,16 @@ setInterval(() => this.loadMemoryStats(), 30000);
 - Memory stats auto-refresh every 30 seconds
 - Activity log refreshes every 2 seconds
 
-### Priority 2 - IMPORTANT (Faire aujourd'hui)
-4. ⏳ GitHub last commit timestamp
-5. ⏳ MCP servers health check
+### Priority 2 - IMPORTANT ✅ COMPLETED (2025-09-29 22:43)
+4. ✅ GitHub last commit timestamp (Shows "Last sync: X ago" with green/yellow badge)
+5. ✅ MCP servers health check (Real-time status ref-tools & filesystem)
+
+**Implementation Details:**
+- GitHub sync badge changes color: Green (synced), Yellow (pending)
+- Displays commit hash (short) and relative time ("il y a X minutes")
+- MCP status shows X/Y format with individual server details
+- Both auto-refresh: GitHub 30s, MCP 60s
+- Created comprehensive SESSION_RESTART_GUIDE.md
 
 ### Priority 3 - NICE TO HAVE
 7. ⏳ Animation pour nouveaux logs
