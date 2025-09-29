@@ -337,6 +337,53 @@ def get_agents():
         logger.error(f"Error loading agents: {e}")
         return jsonify([])
 
+@app.route('/api/activity/log')
+def get_activity_log():
+    """Obtenir les dernières activités des agents"""
+    activity_log_file = MEMORY_DIR / 'activity_logs' / 'agent_activity.log'
+
+    if not activity_log_file.exists():
+        return jsonify([])
+
+    try:
+        activities = []
+        with open(activity_log_file, 'r') as f:
+            lines = f.readlines()
+            # Lire les 50 dernières lignes (exclure les commentaires)
+            for line in reversed(lines[-50:]):
+                if line.strip() and not line.startswith('#'):
+                    activities.append(line.strip())
+
+        return jsonify(activities)
+    except Exception as e:
+        logger.error(f"Error reading activity log: {e}")
+        return jsonify([])
+
+@app.route('/api/activity/add', methods=['POST'])
+def add_activity():
+    """Ajouter une activité d'agent"""
+    try:
+        data = request.json
+        agent = data.get('agent', 'Unknown')
+        status = data.get('status', 'active')
+        action = data.get('action', '')
+
+        activity_log_file = MEMORY_DIR / 'activity_logs' / 'agent_activity.log'
+        activity_log_file.parent.mkdir(exist_ok=True)
+
+        timestamp = subprocess.run(['date', '+%Y-%m-%d %H:%M:%S'],
+                                   capture_output=True, text=True).stdout.strip()
+
+        log_entry = f"[{timestamp}] [{agent}] [{status}] {action}\n"
+
+        with open(activity_log_file, 'a') as f:
+            f.write(log_entry)
+
+        return jsonify({'success': True, 'message': 'Activity logged'})
+    except Exception as e:
+        logger.error(f"Error adding activity: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
 if __name__ == '__main__':
     print("🚀 Démarrage du serveur Claude Code CEO Configuration Manager")
     print(f"📁 Répertoire mémoire: {MEMORY_DIR}")
