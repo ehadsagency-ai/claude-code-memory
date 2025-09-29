@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  claude-code-ceo:
+    container_name: claude-code-ceo-system
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.complete
+    image: ehadsagency-ai/claude-code-ceo:2.0
+    ports:
+      - "3000:3000"  # Dashboard
+    volumes:
+      # Persist global memory
+      - claude_memory:/root/.claude/global_memory
+      # Optional: Mount local configuration
+      - ./config:/root/.claude/config:ro
+    environment:
+      # GitHub configuration (optional - for auto-save)
+      - GITHUB_USER=${GITHUB_USER:-ehadsagency-ai}
+      - GITHUB_EMAIL=${GITHUB_EMAIL:-ehads.agency@gmail.com}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - GITHUB_REPO=${GITHUB_REPO:-claude-code-memory}
+      # System configuration
+      - AUTO_SAVE_ENABLED=${AUTO_SAVE_ENABLED:-true}
+      - AUTO_SAVE_INTERVAL=${AUTO_SAVE_INTERVAL:-120}
+      - DASHBOARD_PORT=3000
+    networks:
+      - claude_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    labels:
+      com.docker.compose.project: "claude-code-ceo"
+      description: "Claude Code CEO System with Multi-Agent Configuration"
+      version: "2.0"
+
+volumes:
+  claude_memory:
+    driver: local
+    labels:
+      description: "Claude Code global memory storage"
+
+networks:
+  claude_network:
+    driver: bridge
+    labels:
+      description: "Claude Code CEO internal network"
