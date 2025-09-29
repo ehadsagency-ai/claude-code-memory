@@ -1,0 +1,141 @@
+# Claude Code CEO System - Complete Package with Multi-Agent Configuration
+# Version: 2.0 (2025-09-29)
+# Includes: Dashboard, Auto-save, 13 Agents, Real-time monitoring
+
+FROM python:3.11-slim
+
+LABEL maintainer="ehadsagency-ai <ehads.agency@gmail.com>"
+LABEL description="Claude Code CEO System with complete multi-agent configuration"
+LABEL version="2.0.0"
+LABEL org.opencontainers.image.source="https://github.com/ehadsagency-ai/claude-code-memory"
+
+# Environment variables
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_APP=server.py
+ENV FLASK_ENV=production
+ENV CLAUDE_HOME=/root/.claude
+ENV MEMORY_DIR=/root/.claude/global_memory
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    wget \
+    rsync \
+    openssh-client \
+    vim \
+    nano \
+    htop \
+    jq \
+    procps \
+    lsof \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create directory structure
+RUN mkdir -p /root/.claude/global_memory/{ui,sync_scripts,activity_logs,architectures,error_patterns,optimizations,decision_history,setup_guides,install_scripts}
+
+# Copy Python requirements
+COPY requirements.txt /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt && rm /tmp/requirements.txt
+
+# Copy COMPLETE configuration from GitHub repo
+# This includes: agents.json, dashboard, auto-save, all docs
+WORKDIR /root/.claude/global_memory
+
+# Copy all files from current working directory
+COPY . /root/.claude/global_memory/
+
+# Copy agent configuration
+COPY ../settings.json /root/.claude/settings.json
+
+# Ensure Python environment for dashboard
+RUN cd /root/.claude/global_memory/ui && \
+    python3 -m venv venv && \
+    . venv/bin/activate && \
+    pip install --no-cache-dir flask requests
+
+# Make all scripts executable
+RUN find /root/.claude/global_memory -name "*.sh" -type f -exec chmod +x {} \;
+
+# Configure Git
+RUN git config --global user.name "ehadsagency-ai" && \
+    git config --global user.email "ehads.agency@gmail.com" && \
+    git config --global init.defaultBranch main
+
+# Create startup script with ALL services
+RUN cat > /root/start_claude_ceo.sh << 'EOFSTARTUP'
+#!/bin/bash
+set -e
+
+echo "🚀 Claude Code CEO System v2.0"
+echo "================================"
+echo ""
+echo "📊 Features:"
+echo "  ✅ Dashboard (Real-time monitoring)"
+echo "  ✅ Auto-save (2 min interval)"
+echo "  ✅ Multi-agent (13 agents configured)"
+echo "  ✅ GitHub sync"
+echo "  ✅ MCP servers (ref-tools, filesystem)"
+echo ""
+
+# Set working directory
+cd /root/.claude/global_memory
+
+# Check if GitHub token is configured
+if [ -f "sync_scripts/credentials.sh" ]; then
+    echo "✅ GitHub credentials found"
+    source sync_scripts/credentials.sh
+else
+    echo "⚠️  GitHub credentials not configured"
+    echo "   Set GITHUB_TOKEN environment variable to enable auto-save"
+fi
+
+# Start all services
+echo ""
+echo "🚀 Starting services..."
+./start_all.sh
+
+# Display access information
+echo ""
+echo "================================"
+echo "✅ System Ready!"
+echo ""
+echo "📍 Access points:"
+echo "  Dashboard:  http://localhost:3000"
+echo "  API:        http://localhost:3000/api/*"
+echo ""
+echo "📋 Available agents:"
+echo "  • CEO Orchestrator (Strategic + Memory)"
+echo "  • CTO Technical Lead (DevOps, DevSecOps, Fullstack)"
+echo "  • CRO Research Lead (Compliance, Legal, RGPD)"
+echo "  + 10 specialist agents"
+echo ""
+echo "📁 Logs:"
+echo "  Dashboard:  /tmp/dashboard.log"
+echo "  Auto-save:  /tmp/auto_save.log"
+echo ""
+echo "📚 Documentation:"
+echo "  /root/.claude/global_memory/CLAUDE_CODE.md"
+echo "  /root/.claude/global_memory/SESSION_RESTART_GUIDE.md"
+echo ""
+echo "================================"
+
+# Keep container running and tail logs
+tail -f /tmp/dashboard.log
+EOFSTARTUP
+
+RUN chmod +x /root/start_claude_ceo.sh
+
+# Expose ports
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:3000/api/status || exit 1
+
+# Volume for persistent data
+VOLUME ["/root/.claude/global_memory"]
+
+# Entrypoint
+ENTRYPOINT ["/root/start_claude_ceo.sh"]
