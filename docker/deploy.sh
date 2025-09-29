@@ -204,28 +204,54 @@ verify_deployment() {
     fi
 }
 
+# Bannière DEO finale
+show_deo_banner() {
+    echo ""
+    echo -e "${BLUE}"
+    cat << 'EOF'
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║    ██████╗ ███████╗ ██████╗     ███████╗██╗   ██╗███████╗████████╗███████╗ ║
+║    ██╔══██╗██╔════╝██╔═══██╗    ██╔════╝╚██╗ ██╔╝██╔════╝╚══██╔══╝██╔════╝ ║
+║    ██║  ██║█████╗  ██║   ██║    ███████╗ ╚████╔╝ ███████╗   ██║   █████╗   ║
+║    ██║  ██║██╔══╝  ██║   ██║    ╚════██║  ╚██╔╝  ╚════██║   ██║   ██╔══╝   ║
+║    ██████╔╝███████╗╚██████╔╝    ███████║   ██║   ███████║   ██║   ███████╗ ║
+║    ╚═════╝ ╚══════╝ ╚═════╝     ╚══════╝   ╚═╝   ╚══════╝   ╚═╝   ╚══════╝ ║
+║                                                                            ║
+║                    🚀 DIGITAL EXECUTIVE OFFICER 🚀                         ║
+║                                                                            ║
+║                    Enterprise Claude Code Configuration                    ║
+║                           Global Memory System                             ║
+║                        Hierarchical Agent Management                       ║
+║                                                                            ║
+║              👤 ehadsagency-ai  |  📧 ehads.agency@gmail.com               ║
+║                                                                            ║
+║    ✅ Docker Deployment: Active   🧠 CEO Memory: Operational               ║
+║    ✅ Web Interface: Running      🔄 GitHub Sync: Configured               ║
+║    ✅ Agent Systems: Ready        📊 Dashboard: http://localhost:5000      ║
+║                                                                            ║
+║               🌟 Your Professional Claude Code is Ready! 🌟               ║
+║                                                                            ║
+║    Management Commands:                                                    ║
+║    • View Logs: docker logs -f claude-code-ceo                            ║
+║    • Stop System: docker stop claude-code-ceo                             ║
+║    • Access Shell: docker exec -it claude-code-ceo bash                   ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+EOF
+    echo -e "${NC}"
+    echo ""
+    echo -e "${GREEN}    🎯 DEO DOCKER SYSTEM: FULLY OPERATIONAL${NC}"
+    echo ""
+    echo -e "${YELLOW}    Container: $(docker ps --format '{{.Status}}' -f name=claude-code-ceo)${NC}"
+    echo ""
+    echo -e "${RED}    🔥 Ready to manage enterprise development! 🔥${NC}"
+    echo ""
+}
+
 # Affichage des informations finales
 show_final_info() {
-    echo ""
-    echo "🎉 DÉPLOIEMENT TERMINÉ AVEC SUCCÈS !"
-    echo "===================================="
-    echo ""
-    echo "🌐 Interface Claude Code CEO:"
-    echo "   URL: http://localhost:5000"
-    echo "   API: http://localhost:5000/api/status"
-    echo ""
-    echo "📊 Conteneur Docker:"
-    echo "   Nom: $CONTAINER_NAME"
-    echo "   Image: $DOCKER_IMAGE:$VERSION"
-    echo "   Status: $(docker ps --format 'table {{.Status}}' -f name="$CONTAINER_NAME" | tail -n +2)"
-    echo ""
-    echo "🔧 Commandes utiles:"
-    echo "   Logs: docker logs -f $CONTAINER_NAME"
-    echo "   Arrêt: docker stop $CONTAINER_NAME"
-    echo "   Shell: docker exec -it $CONTAINER_NAME bash"
-    echo ""
-    echo "💫 Configuration professionnelle déployée !"
-    echo ""
+    show_deo_banner
 
     # Ouvrir le navigateur automatiquement
     if command -v open &> /dev/null; then
