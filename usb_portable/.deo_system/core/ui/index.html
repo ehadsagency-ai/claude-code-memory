@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code CEO - Configuration Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div x-data="claudeManager()" class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-blue-600 text-white p-3 rounded-full">
+                        <i class="fas fa-brain text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-800">Claude Code CEO</h1>
+                        <p class="text-gray-600">Configuration Manager Professional</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2" :class="connectionStatus ? 'text-green-600' : 'text-red-600'">
+                    <i class="fas fa-circle text-sm"></i>
+                    <span x-text="connectionStatus ? 'Connected' : 'Disconnected'" class="font-medium"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Panel - Configuration -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- GitHub Configuration -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">
+                            <i class="fab fa-github mr-2"></i>
+                            Configuration GitHub
+                        </h2>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm" x-text="githubStatus"></span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Username GitHub</label>
+                            <input type="text" x-model="githubConfig.username"
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="ehadsagency-ai" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input type="email" x-model="githubConfig.email"
+                                   class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="ehads.agency@gmail.com" readonly>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Personal Access Token
+                                <a href="https://github.com/settings/tokens" target="_blank" class="text-blue-600 hover:underline ml-2">
+                                    <i class="fas fa-external-link-alt text-xs"></i>
+                                </a>
+                            </label>
+                            <div class="relative">
+                                <input :type="showToken ? 'text' : 'password'" x-model="githubConfig.token"
+                                       class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-20"
+                                       placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+                                <button @click="showToken = !showToken"
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                    <i :class="showToken ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                                </button>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Permissions requises: repo, workflow, write:packages
+                            </p>
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <button @click="testGithubConnection()"
+                                    class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-plug mr-2"></i>
+                                Tester Connexion
+                            </button>
+                            <button @click="saveGithubConfig()"
+                                    class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                                <i class="fas fa-save mr-2"></i>
+                                Sauvegarder
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Memory Management -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-database mr-2"></i>
+                            Gestion Mémoire Globale
+                        </h2>
+                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm" x-text="memorySize"></span>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div class="text-center p-4 bg-blue-50 rounded-lg">
+                            <i class="fas fa-bug text-blue-600 text-2xl mb-2"></i>
+                            <div class="font-bold text-lg" x-text="stats.errorPatterns"></div>
+                            <div class="text-sm text-gray-600">Erreurs</div>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                            <i class="fas fa-sitemap text-green-600 text-2xl mb-2"></i>
+                            <div class="font-bold text-lg" x-text="stats.architectures"></div>
+                            <div class="text-sm text-gray-600">Architectures</div>
+                        </div>
+                        <div class="text-center p-4 bg-purple-50 rounded-lg">
+                            <i class="fas fa-rocket text-purple-600 text-2xl mb-2"></i>
+                            <div class="font-bold text-lg" x-text="stats.optimizations"></div>
+                            <div class="text-sm text-gray-600">Optimisations</div>
+                        </div>
+                        <div class="text-center p-4 bg-orange-50 rounded-lg">
+                            <i class="fas fa-history text-orange-600 text-2xl mb-2"></i>
+                            <div class="font-bold text-lg" x-text="stats.decisions"></div>
+                            <div class="text-sm text-gray-600">Décisions</div>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4">
+                        <button @click="syncToGithub()"
+                                class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-upload mr-2"></i>
+                            Sync vers GitHub
+                        </button>
+                        <button @click="pullFromGithub()"
+                                class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                            <i class="fas fa-download mr-2"></i>
+                            Pull depuis GitHub
+                        </button>
+                        <button @click="viewMemory()"
+                                class="flex-1 bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                            <i class="fas fa-eye mr-2"></i>
+                            Visualiser
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Panel - Status & Agents -->
+            <div class="space-y-6">
+
+                <!-- System Status -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-heartbeat mr-2"></i>
+                        Status Système
+                    </h3>
+
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Claude Code</span>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
+                                <i class="fas fa-check mr-1"></i>Actif
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Mode Production</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                                <i class="fas fa-cogs mr-1"></i>Activé
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">MCP Servers</span>
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">
+                                <i class="fas fa-plug mr-1"></i>2 Connectés
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Agents Actifs</span>
+                            <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs" x-text="agents.length + ' Agents'">
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Agent Hierarchy -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-users mr-2"></i>
+                        Hiérarchie Agents
+                    </h3>
+
+                    <div class="space-y-4">
+                        <!-- CEO -->
+                        <div class="border-l-4 border-red-500 pl-4">
+                            <div class="flex items-center justify-between">
+                                <div class="font-medium text-red-700">
+                                    <i class="fas fa-crown mr-1"></i>
+                                    CEO Orchestrator
+                                </div>
+                                <span class="text-xs text-gray-500">Executive</span>
+                            </div>
+                            <div class="text-xs text-gray-600 mt-1">Strategic + Global Memory</div>
+                        </div>
+
+                        <!-- CTO -->
+                        <div class="border-l-4 border-blue-500 pl-4">
+                            <div class="flex items-center justify-between">
+                                <div class="font-medium text-blue-700">
+                                    <i class="fas fa-laptop-code mr-1"></i>
+                                    CTO Technical Lead
+                                </div>
+                                <span class="text-xs text-gray-500">Technical</span>
+                            </div>
+                            <div class="text-xs text-gray-600 mt-1">DevOps, DevSecOps, Fullstack</div>
+                        </div>
+
+                        <!-- CRO -->
+                        <div class="border-l-4 border-green-500 pl-4">
+                            <div class="flex items-center justify-between">
+                                <div class="font-medium text-green-700">
+                                    <i class="fas fa-book mr-1"></i>
+                                    CRO Research Lead
+                                </div>
+                                <span class="text-xs text-gray-500">Research</span>
+                            </div>
+                            <div class="text-xs text-gray-600 mt-1">Compliance, Legal, RGPD</div>
+                        </div>
+                    </div>
+
+                    <button @click="showAgentDetails = !showAgentDetails"
+                            class="w-full mt-4 text-blue-600 hover:text-blue-800 text-sm">
+                        <i :class="showAgentDetails ? 'fas fa-chevron-up' : 'fas fa-chevron-down'" class="mr-1"></i>
+                        <span x-text="showAgentDetails ? 'Masquer détails' : 'Voir tous les agents'"></span>
+                    </button>
+
+                    <div x-show="showAgentDetails" x-transition class="mt-4 space-y-2">
+                        <template x-for="agent in agents.slice(3)" :key="agent.name">
+                            <div class="text-sm p-2 bg-gray-50 rounded">
+                                <div class="font-medium" x-text="agent.name"></div>
+                                <div class="text-xs text-gray-600" x-text="agent.description"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-bolt mr-2"></i>
+                        Actions Rapides
+                    </h3>
+
+                    <div class="space-y-3">
+                        <button class="w-full text-left p-3 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors">
+                            <i class="fas fa-crown mr-2"></i>
+                            Activer CEO
+                        </button>
+                        <button class="w-full text-left p-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors">
+                            <i class="fas fa-laptop-code mr-2"></i>
+                            Activer CTO
+                        </button>
+                        <button class="w-full text-left p-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors">
+                            <i class="fas fa-book mr-2"></i>
+                            Activer CRO
+                        </button>
+                        <button class="w-full text-left p-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors">
+                            <i class="fas fa-database mr-2"></i>
+                            Accès Mémoire
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div x-show="message.text" x-transition
+             :class="message.type === 'success' ? 'bg-green-100 border-green-500 text-green-700' : 'bg-red-100 border-red-500 text-red-700'"
+             class="mt-8 border-l-4 p-4 rounded-r-lg">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i :class="message.type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle'"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm" x-text="message.text"></p>
+                </div>
+                <div class="ml-auto pl-3">
+                    <button @click="message.text = ''" class="text-sm hover:opacity-75">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function claudeManager() {
+            return {
+                connectionStatus: true,
+                githubStatus: 'Non configuré',
+                memorySize: '44KB',
+                showToken: false,
+                showAgentDetails: false,
+
+                githubConfig: {
+                    username: 'ehadsagency-ai',
+                    email: 'ehads.agency@gmail.com',
+                    token: ''
+                },
+
+                stats: {
+                    errorPatterns: 12,
+                    architectures: 3,
+                    optimizations: 8,
+                    decisions: 15
+                },
+
+                agents: [
+                    { name: 'CEO Orchestrator', description: 'Strategic orchestrator and global memory manager' },
+                    { name: 'CTO Technical Lead', description: 'Technical leadership and architecture decisions' },
+                    { name: 'CRO Research Lead', description: 'Research, compliance and documentation leadership' },
+                    { name: 'DevOps Specialist', description: 'CI/CD, infrastructure automation, and deployment' },
+                    { name: 'DevSecOps Specialist', description: 'Security automation and compliance' },
+                    { name: 'Full-Stack Developer', description: 'End-to-end application development' },
+                    { name: 'Compliance Specialist', description: 'Regulatory and standards compliance' },
+                    { name: 'Legal Advisor', description: 'Legal compliance and risk assessment' },
+                    { name: 'RGPD Specialist', description: 'Data protection compliance' }
+                ],
+
+                message: {
+                    text: '',
+                    type: 'success'
+                },
+
+                init() {
+                    this.loadConfig();
+                    this.checkStatus();
+                },
+
+                loadConfig() {
+                    // Simuler le chargement de la configuration
+                    setTimeout(() => {
+                        this.githubStatus = 'Prêt à configurer';
+                    }, 1000);
+                },
+
+                checkStatus() {
+                    // Vérifier le status du système
+                    this.connectionStatus = true;
+                },
+
+                async testGithubConnection() {
+                    if (!this.githubConfig.token) {
+                        this.showMessage('Veuillez saisir un token GitHub', 'error');
+                        return;
+                    }
+
+                    this.githubStatus = 'Test en cours...';
+
+                    try {
+                        // Simulation d'appel API
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        this.githubStatus = 'Connecté';
+                        this.showMessage('Connexion GitHub réussie !', 'success');
+                    } catch (error) {
+                        this.githubStatus = 'Erreur de connexion';
+                        this.showMessage('Erreur de connexion GitHub', 'error');
+                    }
+                },
+
+                async saveGithubConfig() {
+                    if (!this.githubConfig.token) {
+                        this.showMessage('Token GitHub requis', 'error');
+                        return;
+                    }
+
+                    try {
+                        // Simulation de sauvegarde
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        this.showMessage('Configuration sauvegardée avec succès', 'success');
+                        this.githubStatus = 'Configuré';
+                    } catch (error) {
+                        this.showMessage('Erreur lors de la sauvegarde', 'error');
+                    }
+                },
+
+                async syncToGithub() {
+                    if (this.githubStatus !== 'Configuré' && this.githubStatus !== 'Connecté') {
+                        this.showMessage('Configuration GitHub requise', 'error');
+                        return;
+                    }
+
+                    try {
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        this.showMessage('Synchronisation vers GitHub réussie', 'success');
+                    } catch (error) {
+                        this.showMessage('Erreur de synchronisation', 'error');
+                    }
+                },
+
+                async pullFromGithub() {
+                    try {
+                        await new Promise(resolve => setTimeout(resolve, 1500));
+                        this.showMessage('Données récupérées depuis GitHub', 'success');
+                        // Mettre à jour les stats
+                        this.stats.errorPatterns += 2;
+                        this.stats.optimizations += 1;
+                    } catch (error) {
+                        this.showMessage('Erreur lors de la récupération', 'error');
+                    }
+                },
+
+                viewMemory() {
+                    this.showMessage('Ouverture de la visualisation mémoire...', 'success');
+                    // Ouvrir une nouvelle fenêtre ou modal pour la visualisation
+                },
+
+                showMessage(text, type = 'success') {
+                    this.message = { text, type };
+                    setTimeout(() => {
+                        this.message.text = '';
+                    }, 5000);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

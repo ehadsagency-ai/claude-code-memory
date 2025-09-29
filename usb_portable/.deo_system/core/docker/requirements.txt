@@ -1,0 +1,33 @@
+# Claude Code CEO - Python Dependencies
+# Production-ready dependencies for Docker deployment
+
+# Web Framework
+Flask==2.3.3
+Flask-CORS==4.0.0
+
+# HTTP Requests
+requests==2.31.0
+
+# System utilities
+psutil==5.9.6
+
+# JSON handling
+jsonschema==4.19.2
+
+# Git operations
+GitPython==3.1.40
+
+# Environment management
+python-dotenv==1.0.0
+
+# Logging
+structlog==23.2.0
+
+# Security
+cryptography==41.0.8
+
+# Performance monitoring
+prometheus-client==0.19.0
+
+# Async support (si nécessaire)
+gevent==23.9.1

@@ -1,0 +1,93 @@
+{
+  "project_architectures": {
+    "metadata": {
+      "version": "1.0",
+      "ceo_managed": true,
+      "last_updated": null,
+      "total_architectures": 0
+    },
+    "architecture_templates": {
+      "data_science_course": {
+        "id": "ds_course_docker_jupyter",
+        "name": "Data Science Course with Docker + Jupyter",
+        "description": "Educational data science environment with containerized Jupyter",
+        "success_rating": 0.95,
+        "use_cases": ["educational_projects", "data_science_training", "jupyter_based_analysis"],
+        "components": {
+          "containerization": {
+            "technology": "Docker + Docker Compose",
+            "config_files": ["Dockerfile", "docker-compose.yml", "requirements.txt"],
+            "benefits": ["environment_isolation", "reproducibility", "easy_deployment"]
+          },
+          "data_platform": {
+            "technology": "Jupyter Lab",
+            "port": 8888,
+            "volume_mapping": "./Student_Work:/home/jovyan/data_analyst_course/Student_Work",
+            "benefits": ["interactive_development", "educational_friendly", "data_visualization"]
+          },
+          "python_stack": {
+            "core_libraries": ["pandas", "numpy", "matplotlib", "seaborn", "scikit-learn"],
+            "development_tools": ["black", "flake8", "pytest"],
+            "data_tools": ["bokeh", "plotly", "pyspark"]
+          }
+        },
+        "proven_patterns": {
+          "directory_structure": {
+            "modules": "Sequential learning modules (Module_01, Module_02, etc.)",
+            "student_work": "Persistent workspace for student files",
+            "resources": "Shared datasets and examples",
+            "assessments": "Exams and evaluation materials"
+          },
+          "best_practices": [
+            "Volume mounting for data persistence",
+            "No authentication tokens for educational ease",
+            "Health checks for container monitoring",
+            "Multi-stage builds for optimization"
+          ]
+        },
+        "common_issues_and_solutions": {
+          "port_conflicts": "Use docker-compose down before restart",
+          "permission_issues": "Ensure proper volume ownership",
+          "memory_limits": "Configure container resource limits",
+          "package_conflicts": "Use virtual environments within containers"
+        }
+      }
+    },
+    "architectural_decisions": {
+      "containerization_strategy": {
+        "decision": "Docker over virtual environments",
+        "rationale": "Better isolation, reproducibility, and deployment consistency",
+        "trade_offs": "Slightly higher resource usage for better reliability",
+        "projects_applied": ["data_science_course"]
+      },
+      "jupyter_vs_alternatives": {
+        "decision": "Jupyter Lab over VSCode/PyCharm for educational content",
+        "rationale": "Interactive cells, visualization support, educational workflow",
+        "trade_offs": "Less robust debugging vs better learning experience",
+        "projects_applied": ["data_science_course"]
+      }
+    },
+    "optimization_patterns": {
+      "performance_optimizations": [
+        {
+          "pattern": "pandas_vectorization",
+          "description": "Replace loops with vectorized operations",
+          "performance_gain": "10x-100x improvement",
+          "applicable_scenarios": ["data_processing", "mathematical_operations"]
+        },
+        {
+          "pattern": "memory_efficient_loading",
+          "description": "Chunk processing for large datasets",
+          "performance_gain": "Enables processing of datasets larger than memory",
+          "applicable_scenarios": ["large_csv_processing", "streaming_data"]
+        }
+      ]
+    },
+    "reusable_components": {
+      "docker_configurations": [],
+      "jupyter_setups": [],
+      "python_environments": [],
+      "ci_cd_pipelines": []
+    }
+  }
+}

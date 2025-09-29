@@ -1,0 +1,75 @@
+{
+  "global_memory_system": {
+    "version": "1.0",
+    "ceo_managed": true,
+    "storage_architecture": {
+      "local_cache": {
+        "path": "~/.claude/global_memory/",
+        "purpose": "immediate_access_performance",
+        "structure": {
+          "error_patterns/": "All error patterns and solutions from all projects",
+          "architectures/": "Project architectures and design patterns",
+          "optimizations/": "Code optimization patterns and benchmarks",
+          "project_templates/": "Reusable project configurations",
+          "decision_history/": "Strategic and technical decisions with rationale"
+        }
+      },
+      "github_persistence": {
+        "repository": "claude-code-memory",
+        "purpose": "long_term_persistence_versioning",
+        "sync_strategy": "auto_after_each_significant_change",
+        "structure": {
+          "errors/": "Categorized error solutions",
+          "patterns/": "Architectural patterns",
+          "optimizations/": "Performance improvements",
+          "templates/": "Project templates",
+          "decisions/": "Decision logs"
+        }
+      },
+      "mcp_integration": {
+        "purpose": "research_validation_enhancement",
+        "tools": ["context7", "ref-tools"],
+        "usage": "validate_solutions_find_alternatives"
+      }
+    },
+    "auto_save_triggers": [
+      "error_resolution_successful",
+      "architecture_decision_made",
+      "optimization_pattern_discovered",
+      "project_template_created",
+      "significant_code_improvement"
+    ],
+    "retrieval_system": {
+      "search_priority": [
+        "local_cache_exact_match",
+        "local_cache_similar_pattern",
+        "github_repository_search",
+        "mcp_external_research"
+      ],
+      "learning_mechanism": "track_solution_effectiveness"
+    }
+  },
+  "ceo_responsibilities": {
+    "memory_oversight": [
+      "Monitor all error patterns across projects",
+      "Maintain architecture consistency",
+      "Ensure knowledge transfer between projects",
+      "Optimize based on historical performance data",
+      "Prevent recurring issues through pattern matching"
+    ],
+    "strategic_memory_decisions": [
+      "Which patterns to promote to templates",
+      "When to deprecate outdated solutions",
+      "How to organize knowledge for maximum efficiency",
+      "Resource allocation for memory management",
+      "Cross-project knowledge synthesis"
+    ]
+  },
+  "multi_project_benefits": {
+    "code_efficiency": "Reuse optimized patterns immediately",
+    "error_prevention": "Avoid known pitfalls from previous projects",
+    "architecture_consistency": "Apply proven designs across projects",
+    "decision_speed": "Leverage past decision rationale",
+    "knowledge_accumulation": "Build expertise database over time"
+  }
+}

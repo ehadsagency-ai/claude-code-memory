@@ -1,0 +1,18 @@
+[Autorun]
+label=DEO Smart USB
+icon=deo-smart-icon.ico
+open=MENU_SELECTION.bat
+action=Choisir Mode d'Utilisation
+shell\choix_mode=🚀 Sélectionner Mode USB
+shell\choix_mode\command=MENU_SELECTION.bat
+shell\usb_normal=🗂️ Mode USB Normal
+shell\usb_normal\command=explorer.exe .
+shell\deo_install=🧠 Mode Claude Code DEO
+shell\deo_install\command=.deo_system\scripts\DEMARRER_DEO_WINDOWS.bat
+shell\readme=📖 Lire Documentation
+shell\readme\command=notepad.exe README.md
+
+[Content]
+MusicFiles=false
+PictureFiles=false
+VideoFiles=false
