@@ -217,39 +217,51 @@
 
                     <div class="space-y-4">
                         <!-- CEO -->
-                        <div class="border-l-4 border-red-500 pl-4">
-                            <div class="flex items-center justify-between">
+                        <div class="border-l-4 border-red-500 pl-4 bg-red-50 p-3 rounded-r-lg">
+                            <div class="flex items-center justify-between mb-2">
                                 <div class="font-medium text-red-700">
                                     <i class="fas fa-crown mr-1"></i>
                                     CEO Orchestrator
                                 </div>
-                                <span class="text-xs text-gray-500">Executive</span>
+                                <span class="px-2 py-1 rounded-full text-xs flex items-center"
+                                      :class="getAgentStatusBadge('CEO-Orchestrator')">
+                                    <i class="fas fa-circle text-xs mr-1" :class="getAgentStatusIcon('CEO-Orchestrator')"></i>
+                                    <span x-text="getAgentStatusText('CEO-Orchestrator')"></span>
+                                </span>
                             </div>
-                            <div class="text-xs text-gray-600 mt-1">Strategic + Global Memory</div>
+                            <div class="text-xs text-gray-600">Strategic + Global Memory</div>
                         </div>
 
                         <!-- CTO -->
-                        <div class="border-l-4 border-blue-500 pl-4">
-                            <div class="flex items-center justify-between">
+                        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded-r-lg">
+                            <div class="flex items-center justify-between mb-2">
                                 <div class="font-medium text-blue-700">
                                     <i class="fas fa-laptop-code mr-1"></i>
                                     CTO Technical Lead
                                 </div>
-                                <span class="text-xs text-gray-500">Technical</span>
+                                <span class="px-2 py-1 rounded-full text-xs flex items-center"
+                                      :class="getAgentStatusBadge('CTO-Technical-Lead')">
+                                    <i class="fas fa-circle text-xs mr-1" :class="getAgentStatusIcon('CTO-Technical-Lead')"></i>
+                                    <span x-text="getAgentStatusText('CTO-Technical-Lead')"></span>
+                                </span>
                             </div>
-                            <div class="text-xs text-gray-600 mt-1">DevOps, DevSecOps, Fullstack</div>
+                            <div class="text-xs text-gray-600">DevOps, DevSecOps, Fullstack</div>
                         </div>
 
                         <!-- CRO -->
-                        <div class="border-l-4 border-green-500 pl-4">
-                            <div class="flex items-center justify-between">
+                        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded-r-lg">
+                            <div class="flex items-center justify-between mb-2">
                                 <div class="font-medium text-green-700">
                                     <i class="fas fa-book mr-1"></i>
                                     CRO Research Lead
                                 </div>
-                                <span class="text-xs text-gray-500">Research</span>
+                                <span class="px-2 py-1 rounded-full text-xs flex items-center"
+                                      :class="getAgentStatusBadge('CRO-Research-Lead')">
+                                    <i class="fas fa-circle text-xs mr-1" :class="getAgentStatusIcon('CRO-Research-Lead')"></i>
+                                    <span x-text="getAgentStatusText('CRO-Research-Lead')"></span>
+                                </span>
                             </div>
-                            <div class="text-xs text-gray-600 mt-1">Compliance, Legal, RGPD</div>
+                            <div class="text-xs text-gray-600">Compliance, Legal, RGPD</div>
                         </div>
                     </div>
 
