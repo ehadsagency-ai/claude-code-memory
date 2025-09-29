@@ -67,16 +67,24 @@
                                 </a>
                             </label>
                             <div class="relative">
-                                <input :type="showToken ? 'text' : 'password'" x-model="githubConfig.token"
+                                <input :type="showToken ? 'text' : 'password'"
+                                       x-model="githubConfig.token"
+                                       :readonly="githubTokenReadOnly"
+                                       :class="githubTokenReadOnly ? 'bg-gray-100 cursor-not-allowed' : ''"
                                        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-20"
                                        placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
                                 <button @click="showToken = !showToken"
-                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                                        type="button"
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
                                     <i :class="showToken ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
                                 </button>
                             </div>
-                            <p class="text-sm text-gray-500 mt-1">
+                            <p x-show="!githubTokenReadOnly" class="text-sm text-gray-500 mt-1">
                                 Permissions requises: repo, workflow, write:packages
+                            </p>
+                            <p x-show="githubTokenReadOnly" class="text-xs text-blue-600 mt-1">
+                                <i class="fas fa-lock mr-1"></i>
+                                Token déjà configuré et sécurisé (lecture seule)
                             </p>
                         </div>
 
@@ -301,57 +309,97 @@
     <script>
         function claudeManager() {
             return {
-                connectionStatus: true,
-                githubStatus: 'Non configuré',
-                memorySize: '44KB',
+                connectionStatus: false,
+                githubStatus: 'Chargement...',
+                memorySize: '0MB',
                 showToken: false,
                 showAgentDetails: false,
+                githubConfigured: false,
+                githubTokenReadOnly: false,
 
                 githubConfig: {
-                    username: 'ehadsagency-ai',
-                    email: 'ehads.agency@gmail.com',
-                    token: ''
+                    username: '',
+                    email: '',
+                    token: '',
+                    repo: 'claude-code-memory'
                 },
 
                 stats: {
-                    errorPatterns: 12,
-                    architectures: 3,
-                    optimizations: 8,
-                    decisions: 15
+                    errorPatterns: 0,
+                    architectures: 0,
+                    optimizations: 0,
+                    decisions: 0,
+                    totalFiles: 0,
+                    totalSize: '0MB'
                 },
 
-                agents: [
-                    { name: 'CEO Orchestrator', description: 'Strategic orchestrator and global memory manager' },
-                    { name: 'CTO Technical Lead', description: 'Technical leadership and architecture decisions' },
-                    { name: 'CRO Research Lead', description: 'Research, compliance and documentation leadership' },
-                    { name: 'DevOps Specialist', description: 'CI/CD, infrastructure automation, and deployment' },
-                    { name: 'DevSecOps Specialist', description: 'Security automation and compliance' },
-                    { name: 'Full-Stack Developer', description: 'End-to-end application development' },
-                    { name: 'Compliance Specialist', description: 'Regulatory and standards compliance' },
-                    { name: 'Legal Advisor', description: 'Legal compliance and risk assessment' },
-                    { name: 'RGPD Specialist', description: 'Data protection compliance' }
-                ],
+                agents: [],
 
                 message: {
                     text: '',
                     type: 'success'
                 },
 
-                init() {
-                    this.loadConfig();
-                    this.checkStatus();
+                async init() {
+                    await this.loadConfig();
+                    await this.checkStatus();
+                    await this.loadMemoryStats();
+                    await this.loadAgents();
                 },
 
-                loadConfig() {
-                    // Simuler le chargement de la configuration
-                    setTimeout(() => {
-                        this.githubStatus = 'Prêt à configurer';
-                    }, 1000);
+                async loadConfig() {
+                    try {
+                        const response = await fetch('/api/github/config');
+                        const config = await response.json();
+                        this.githubConfig = config;
+
+                        // Si le token existe (même masqué), marquer comme configuré et en lecture seule
+                        if (config.token && config.token.length > 0) {
+                            this.githubConfigured = true;
+                            this.githubTokenReadOnly = true;
+                            this.githubStatus = '✅ Configuré';
+                        } else {
+                            this.githubStatus = 'Non configuré';
+                        }
+                    } catch (error) {
+                        this.showMessage('Erreur de chargement de la configuration', 'error');
+                    }
                 },
 
-                checkStatus() {
-                    // Vérifier le status du système
-                    this.connectionStatus = true;
+                async checkStatus() {
+                    try {
+                        const response = await fetch('/api/status');
+                        const status = await response.json();
+                        this.connectionStatus = status.connection_status;
+                        this.memorySize = status.memory_size;
+
+                        if (status.agents_active > 0) {
+                            this.githubStatus = '✅ Système Opérationnel';
+                        }
+                    } catch (error) {
+                        this.connectionStatus = false;
+                        this.showMessage('Erreur de connexion au serveur', 'error');
+                    }
+                },
+
+                async loadMemoryStats() {
+                    try {
+                        const response = await fetch('/api/memory/stats');
+                        const stats = await response.json();
+                        this.stats = stats;
+                        this.stats.totalSize = stats.totalSize || this.memorySize;
+                    } catch (error) {
+                        console.error('Erreur de chargement des statistiques:', error);
+                    }
+                },
+
+                async loadAgents() {
+                    try {
+                        const response = await fetch('/api/agents');
+                        this.agents = await response.json();
+                    } catch (error) {
+                        console.error('Erreur de chargement des agents:', error);
+                    }
                 },
 
                 async testGithubConnection() {

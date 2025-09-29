@@ -28,6 +28,15 @@ MEMORY_DIR = CLAUDE_DIR / 'global_memory'
 CREDENTIALS_FILE = CLAUDE_DIR / 'github_credentials'
 SYNC_SCRIPT = MEMORY_DIR / 'sync_scripts' / 'github_sync.sh'
 
+# Try project-specific directory first for agents.json
+PROJECT_DIR = Path("/Users/deo_metoyer/Library/Mobile Documents/com~apple~CloudDocs/MY_GOUV/HOME/PSL_MINES/Data_Analyst/.claude")
+if PROJECT_DIR.exists():
+    AGENTS_FILE = PROJECT_DIR / 'agents.json'
+    SETTINGS_FILE = PROJECT_DIR / 'settings.local.json'
+else:
+    AGENTS_FILE = CLAUDE_DIR / 'agents.json'
+    SETTINGS_FILE = CLAUDE_DIR / 'settings.local.json'
+
 class ClaudeConfigManager:
     """Gestionnaire de configuration Claude Code"""
 
@@ -78,12 +87,11 @@ class ClaudeConfigManager:
 
     def count_agents(self) -> int:
         """Compter les agents configurés"""
-        agents_file = CLAUDE_DIR / 'agents.json'
-        if not agents_file.exists():
+        if not AGENTS_FILE.exists():
             return 0
 
         try:
-            with open(agents_file, 'r') as f:
+            with open(AGENTS_FILE, 'r') as f:
                 data = json.load(f)
                 return len(data.get('agents', {}))
         except Exception as e:
@@ -92,12 +100,11 @@ class ClaudeConfigManager:
 
     def get_mcp_status(self) -> List[str]:
         """Obtenir le status des serveurs MCP"""
-        settings_file = CLAUDE_DIR / 'settings.local.json'
-        if not settings_file.exists():
+        if not SETTINGS_FILE.exists():
             return []
 
         try:
-            with open(settings_file, 'r') as f:
+            with open(SETTINGS_FILE, 'r') as f:
                 data = json.load(f)
                 return data.get('enabledMcpjsonServers', [])
         except Exception as e:
@@ -266,9 +273,8 @@ def get_status():
 def get_github_config():
     """Obtenir la configuration GitHub"""
     config = config_manager.load_github_config()
-    # Masquer le token pour la sécurité
-    if config['token']:
-        config['token'] = config['token'][:10] + '...'
+    # Ne pas masquer le token - il sera masqué côté client avec type="password"
+    # Cela permet au bouton œil de fonctionner correctement
     return jsonify(config)
 
 @app.route('/api/github/config', methods=['POST'])
@@ -312,12 +318,11 @@ def get_memory_stats():
 @app.route('/api/agents')
 def get_agents():
     """Obtenir la liste des agents"""
-    agents_file = CLAUDE_DIR / 'agents.json'
-    if not agents_file.exists():
+    if not AGENTS_FILE.exists():
         return jsonify([])
 
     try:
-        with open(agents_file, 'r') as f:
+        with open(AGENTS_FILE, 'r') as f:
             data = json.load(f)
             agents = []
             for name, config in data.get('agents', {}).items():
@@ -335,7 +340,7 @@ def get_agents():
 if __name__ == '__main__':
     print("🚀 Démarrage du serveur Claude Code CEO Configuration Manager")
     print(f"📁 Répertoire mémoire: {MEMORY_DIR}")
-    print(f"🌐 Interface disponible sur: http://localhost:5000")
+    print(f"🌐 Interface disponible sur: http://localhost:3000")
     print()
 
-    app.run(host='localhost', port=5000, debug=True)
+    app.run(host='localhost', port=3000, debug=False)
