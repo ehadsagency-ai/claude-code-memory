@@ -656,6 +656,28 @@
                         }
                     }
                     return 'idle';
+                },
+
+                getActiveAgentCount() {
+                    // Count agents with active status (planning, active, working, delegating)
+                    const activeStatuses = ['planning', 'active', 'working', 'delegating'];
+                    const activeAgents = new Set();
+
+                    // Parse activity log to find all active agents
+                    for (let i = this.activityLog.length - 1; i >= 0; i--) {
+                        const activity = this.activityLog[i];
+                        const match = activity.match(/\[([^\]]+)\]\s*\[([^\]]+)\]/);
+                        if (match) {
+                            const agent = match[1];
+                            const status = match[2];
+
+                            if (activeStatuses.includes(status) && !activeAgents.has(agent)) {
+                                activeAgents.add(agent);
+                            }
+                        }
+                    }
+
+                    return activeAgents.size;
                 }
             }
         }
