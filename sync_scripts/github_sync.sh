@@ -1,181 +1,148 @@
 #!/bin/bash
-
-# GitHub Sync Script for CEO Global Memory Management
-# This script synchronizes local memory with GitHub repository
-
-set -e
-
-# Load GitHub credentials if available
-if [ -f "$HOME/.claude/github_credentials" ]; then
-    source "$HOME/.claude/github_credentials"
-    echo "🔑 Loaded GitHub credentials"
-elif [ -f "$HOME/.claude/global_memory/github_credentials" ]; then
-    source "$HOME/.claude/global_memory/github_credentials"
-    echo "🔑 Loaded GitHub credentials from memory directory"
-fi
+# GitHub sync script for Claude Code global memory
+# Manages bidirectional sync between local and GitHub
 
 MEMORY_DIR="$HOME/.claude/global_memory"
-GITHUB_REPO="${GITHUB_REPO:-claude-code-memory}"
-GITHUB_USER="${GITHUB_USER:-ehadsagency-ai}"
-GITHUB_EMAIL="${GITHUB_EMAIL:-ehads.agency@gmail.com}"
+SCRIPT_DIR="$MEMORY_DIR/sync_scripts"
+LOG_FILE="$SCRIPT_DIR/github_sync.log"
 
-# Use authenticated URL if token is available
-if [ -n "$GITHUB_TOKEN" ]; then
-    REPO_URL="https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$GITHUB_USER/$GITHUB_REPO.git"
-    echo "🔐 Using authenticated HTTPS with token"
-else
-    REPO_URL="https://github.com/$GITHUB_USER/$GITHUB_REPO.git"
-    echo "⚠️  No token found, using public HTTPS (limited functionality)"
-fi
+# Colors
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m'
 
-TEMP_DIR="/tmp/claude_memory_sync"
+# Function to log with timestamp
+log() {
+    echo -e "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
 
-echo "🧠 CEO Global Memory - GitHub Synchronization"
-echo "=============================================="
+# Change to global memory directory
+cd "$MEMORY_DIR" || exit 1
 
-# Function to initialize repository if it doesn't exist
-init_repository() {
-    echo "📁 Initializing GitHub repository..."
+# Function: Pull latest changes from GitHub
+pull_from_github() {
+    log "${BLUE}📥 Pulling latest changes from GitHub...${NC}"
 
-    if [ ! -d "$TEMP_DIR" ]; then
-        mkdir -p "$TEMP_DIR"
-        cd "$TEMP_DIR"
+    git fetch origin main >> "$LOG_FILE" 2>&1
 
-        # Clone or create repository
-        if git clone "$REPO_URL" . 2>/dev/null; then
-            echo "✅ Repository cloned successfully"
+    # Check if there are remote changes
+    LOCAL=$(git rev-parse @)
+    REMOTE=$(git rev-parse @{u})
+
+    if [ "$LOCAL" = "$REMOTE" ]; then
+        log "${GREEN}✅ Already up to date${NC}"
+        return 0
+    else
+        log "${YELLOW}⬇️  Remote changes detected, pulling...${NC}"
+        git pull origin main >> "$LOG_FILE" 2>&1
+
+        if [ $? -eq 0 ]; then
+            log "${GREEN}✅ Pulled successfully${NC}"
+            return 0
         else
-            echo "🆕 Creating new repository structure"
-            git init
-            git remote add origin "$REPO_URL"
-
-            # Create initial structure
-            mkdir -p {errors,patterns,optimizations,templates,decisions}
-            echo "# Claude Code Memory Repository" > README.md
-            echo "Global memory storage for Claude Code patterns and solutions" >> README.md
-            git add .
-            git commit -m "Initial commit: Claude Code memory structure"
+            log "${RED}❌ Failed to pull${NC}"
+            return 1
         fi
     fi
 }
 
-# Function to sync local memory to GitHub
-sync_to_github() {
-    echo "⬆️  Syncing local memory to GitHub..."
+# Function: Push local changes to GitHub
+push_to_github() {
+    log "${BLUE}📤 Pushing local changes to GitHub...${NC}"
 
-    # Check if we have authentication
-    if [ -z "$GITHUB_TOKEN" ]; then
-        echo "❌ GitHub token required for push operations"
-        echo "💡 Please configure token: ~/.claude/github_credentials"
-        return 1
+    # Check if there are local changes
+    if [[ -z $(git status --porcelain) ]]; then
+        log "${GREEN}✅ No local changes to push${NC}"
+        return 0
     fi
 
-    # Copy local memory to temp directory
-    if [ -d "$MEMORY_DIR" ]; then
-        rsync -av --delete "$MEMORY_DIR/" "$TEMP_DIR/" --exclude=".git" --exclude="github_credentials*"
+    # Add all changes
+    git add .
 
-        cd "$TEMP_DIR"
+    # Get list of changed files
+    CHANGED_FILES=$(git diff --cached --name-only | wc -l | tr -d ' ')
 
-        # Configure git identity for this session
-        git config user.name "$GITHUB_USER"
-        git config user.email "$GITHUB_EMAIL"
+    # Create commit message
+    COMMIT_MSG="🔄 Auto-sync: $CHANGED_FILES file(s) updated
 
-        # Check if there are changes
-        if git status --porcelain | grep -q .; then
-            git add .
-            TIMESTAMP=$(date "+%Y-%m-%d %H:%M:%S")
-            HOSTNAME=$(hostname -s)
-            git commit -m "🧠 CEO Memory Auto-Sync: $TIMESTAMP
+Auto-synced by Claude Code global memory system
+$(date '+%Y-%m-%d %H:%M:%S')
 
-            📍 Host: $HOSTNAME
-            👤 User: $GITHUB_USER
+Changed files:
+$(git diff --cached --name-only | head -10)
+"
 
-            📊 Changes synchronized:
-            - Error patterns and solutions
-            - Project architectures
-            - Optimization patterns
-            - Decision history
-            - Templates and configurations
+    # Commit
+    git commit -m "$COMMIT_MSG" >> "$LOG_FILE" 2>&1
 
-            🤖 Auto-generated by Claude Code CEO Agent"
+    if [ $? -eq 0 ]; then
+        log "${GREEN}✅ Committed locally${NC}"
 
-            echo "🚀 Pushing to GitHub with authentication..."
-            if git push origin main 2>/dev/null || git push origin master 2>/dev/null; then
-                echo "✅ Successfully synced to GitHub"
-                echo "🔗 Repository: https://github.com/$GITHUB_USER/$GITHUB_REPO"
-            else
-                echo "❌ Push failed - checking repository status..."
-                git remote -v
-            fi
+        # Push
+        git push origin main >> "$LOG_FILE" 2>&1
+
+        if [ $? -eq 0 ]; then
+            log "${GREEN}✅ Pushed to GitHub successfully${NC}"
+            return 0
         else
-            echo "ℹ️  No changes to sync"
+            log "${RED}❌ Failed to push to GitHub${NC}"
+            return 1
         fi
     else
-        echo "⚠️  Local memory directory not found: $MEMORY_DIR"
+        log "${YELLOW}⚠️  Nothing to commit${NC}"
+        return 0
     fi
 }
 
-# Function to pull updates from GitHub
-sync_from_github() {
-    echo "⬇️  Syncing from GitHub to local memory..."
+# Function: Full bidirectional sync
+full_sync() {
+    log "${BLUE}🔄 Starting full bidirectional sync...${NC}"
 
-    cd "$TEMP_DIR"
-    git pull origin main || git pull origin master
+    # First pull to get latest changes
+    pull_from_github
 
-    # Sync back to local memory
-    rsync -av --delete "$TEMP_DIR/" "$MEMORY_DIR/"
+    # Then push local changes
+    push_to_github
 
-    echo "✅ Successfully synced from GitHub"
+    log "${GREEN}✅ Full sync completed${NC}"
 }
 
-# Function to show sync status
+# Function: Show status
 show_status() {
-    echo "📊 Memory Sync Status:"
-    echo "Local Memory: $MEMORY_DIR"
-    echo "GitHub Repo: $REPO_URL"
+    log "${BLUE}📊 Git Status:${NC}"
+    git status --short
 
-    if [ -d "$MEMORY_DIR" ]; then
-        MEMORY_SIZE=$(du -sh "$MEMORY_DIR" | cut -f1)
-        MEMORY_FILES=$(find "$MEMORY_DIR" -type f | wc -l)
-        echo "Memory Size: $MEMORY_SIZE"
-        echo "Total Files: $MEMORY_FILES"
-    fi
+    log "\n${BLUE}📝 Recent commits (local):${NC}"
+    git log --oneline --graph -5
 
-    if [ -d "$TEMP_DIR" ]; then
-        cd "$TEMP_DIR"
-        LAST_COMMIT=$(git log -1 --format="%h - %s (%ar)" 2>/dev/null || echo "No commits")
-        echo "Last Sync: $LAST_COMMIT"
-    fi
+    log "\n${BLUE}🌐 Remote status:${NC}"
+    git remote -v
 }
 
-# Main execution
-case "${1:-sync}" in
-    "init")
-        init_repository
+# Main script logic
+case "$1" in
+    pull)
+        pull_from_github
         ;;
-    "push")
-        init_repository
-        sync_to_github
+    push)
+        push_to_github
         ;;
-    "pull")
-        init_repository
-        sync_from_github
+    sync)
+        full_sync
         ;;
-    "sync")
-        init_repository
-        sync_to_github
-        ;;
-    "status")
+    status)
         show_status
         ;;
     *)
-        echo "Usage: $0 {init|push|pull|sync|status}"
-        echo "  init   - Initialize GitHub repository"
-        echo "  push   - Push local memory to GitHub"
-        echo "  pull   - Pull updates from GitHub"
-        echo "  sync   - Full synchronization (default)"
-        echo "  status - Show sync status"
+        echo "Usage: $0 {pull|push|sync|status}"
+        echo ""
+        echo "Commands:"
+        echo "  pull   - Pull latest changes from GitHub"
+        echo "  push   - Push local changes to GitHub"
+        echo "  sync   - Full bidirectional sync (pull then push)"
+        echo "  status - Show current Git status"
+        exit 1
         ;;
 esac
-
-echo "🎯 CEO Memory Management Complete"
