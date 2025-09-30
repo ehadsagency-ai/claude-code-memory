@@ -1,0 +1,5 @@
+[2025-10-01 00:00:00] [0;34m🔄 Starting full bidirectional sync...[0m
+[2025-10-01 00:00:00] [0;34m📥 Pulling latest changes from GitHub...[0m
+[2025-10-01 00:00:03] [1;33m⬇️  Remote changes detected, pulling...[0m
+[2025-10-01 00:00:04] [0;32m✅ Pulled successfully[0m
+[2025-10-01 00:00:04] [0;34m📤 Pushing local changes to GitHub...[0m
