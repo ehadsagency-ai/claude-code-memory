@@ -440,6 +440,24 @@ def get_last_commit():
             'status': 'error'
         })
 
+@app.route('/api/health')
+def health_check():
+    """Healthcheck endpoint for agents"""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': subprocess.run(['date', '+%Y-%m-%d %H:%M:%S'],
+                                   capture_output=True, text=True).stdout.strip(),
+        'agents_configured': config_manager.count_agents(),
+        'dashboard_active': True,
+        'memory_directory': str(MEMORY_DIR),
+        'git_configured': config_manager.check_github_config()
+    })
+
+@app.route('/api/activity')
+def get_all_activities():
+    """Get all agent activities (alias for /api/activity/log)"""
+    return get_activity_log()
+
 @app.route('/api/mcp/status')
 def get_mcp_status():
     """Vérifier le status des serveurs MCP"""
