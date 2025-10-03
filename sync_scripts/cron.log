@@ -286,3 +286,8 @@
 [2025-10-03 19:00:02] [0;32m✅ Committed locally[0m
 [2025-10-03 19:00:05] [0;31m❌ Failed to push to GitHub[0m
 [2025-10-03 19:00:05] [0;32m✅ Full sync completed[0m
+[2025-10-03 22:00:00] [0;34m🔄 Starting full bidirectional sync...[0m
+[2025-10-03 22:00:00] [0;34m📥 Pulling latest changes from GitHub...[0m
+[2025-10-03 22:00:01] [1;33m⬇️  Remote changes detected, pulling...[0m
+[2025-10-03 22:00:02] [0;32m✅ Pulled successfully[0m
+[2025-10-03 22:00:02] [0;34m📤 Pushing local changes to GitHub...[0m
