@@ -271,6 +271,7 @@ GET  /api/user/stats      → Detailed user stats (100/hour limit)
 - [x] Virtual environment + dependencies
 - [x] CORS configuration
 - [x] Auto-reload via Watchdog
+- [x] **Static fallback for GitHub Pages** ✨ NEW
 
 **Features**:
 - [x] 102 notebooks from PSL MINES loaded
@@ -284,6 +285,7 @@ GET  /api/user/stats      → Detailed user stats (100/hour limit)
 - [x] 96+ exercises parsed
 - [x] Hints system
 - [x] Certificate generation
+- [x] **Graceful degradation (works without backend)** ✨ NEW
 
 **Documentation**:
 - [x] 12 comprehensive documentation files
