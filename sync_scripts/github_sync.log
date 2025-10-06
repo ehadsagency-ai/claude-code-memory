@@ -3029,3 +3029,15 @@ Your branch is ahead of 'origin/main' by 168 commits.
 nothing to commit, working tree clean
 [2025-10-06 01:00:01] [1;33m⚠️  Nothing to commit[0m
 [2025-10-06 01:00:01] [0;32m✅ Full sync completed[0m
+[2025-10-06 02:00:00] [0;34m🔄 Starting full bidirectional sync...[0m
+[2025-10-06 02:00:00] [0;34m📥 Pulling latest changes from GitHub...[0m
+failed to store: -61
+From https://github.com/ehadsagency-ai/claude-code-memory
+ * branch            main       -> FETCH_HEAD
+[2025-10-06 02:00:01] [1;33m⬇️  Remote changes detected, pulling...[0m
+failed to store: -61
+From https://github.com/ehadsagency-ai/claude-code-memory
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+[2025-10-06 02:00:01] [0;32m✅ Pulled successfully[0m
+[2025-10-06 02:00:01] [0;34m📤 Pushing local changes to GitHub...[0m
