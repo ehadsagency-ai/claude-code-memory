@@ -3810,3 +3810,22 @@ failed to store: -61
 From https://github.com/ehadsagency-ai/claude-code-memory
  * branch            main       -> FETCH_HEAD
 [2025-10-07 11:00:01] [1;33m⬇️  Remote changes detected, pulling...[0m
+failed to store: -61
+From https://github.com/ehadsagency-ai/claude-code-memory
+ * branch            main       -> FETCH_HEAD
+warning: fetch updated the current branch head.
+fast-forwarding your working tree from
+commit 384edd2e3be6a3ab2a8e5ca5ac34057000c739ce.
+error: Your local changes to the following files would be overwritten by merge:
+	sync_scripts/cron.log
+	sync_scripts/github_sync.log
+Please commit your changes or stash them before you merge.
+Aborting
+fatal: Cannot fast-forward your working tree.
+After making sure that you saved anything precious from
+$ git diff 384edd2e3be6a3ab2a8e5ca5ac34057000c739ce
+output, run
+$ git reset --hard
+to recover.
+[2025-10-07 11:00:01] [0;31m❌ Failed to pull[0m
+[2025-10-07 11:00:02] [0;34m📤 Pushing local changes to GitHub...[0m
