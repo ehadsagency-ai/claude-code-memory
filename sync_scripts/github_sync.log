@@ -3919,3 +3919,6 @@ fatal: unable to access 'https://github.com/ehadsagency-ai/claude-code-memory.gi
 [main 49a1a48] 🔄 Auto-sync: 2 file(s) updated
  2 files changed, 12 insertions(+)
 [2025-10-07 13:00:21] [0;32m✅ Committed locally[0m
+fatal: unable to access 'https://github.com/ehadsagency-ai/claude-code-memory.git/': Could not resolve host: github.com
+[2025-10-07 13:00:32] [0;31m❌ Failed to push to GitHub[0m
+[2025-10-07 13:00:32] [0;32m✅ Full sync completed[0m
