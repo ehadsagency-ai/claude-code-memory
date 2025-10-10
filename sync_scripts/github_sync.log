@@ -5182,3 +5182,10 @@ fatal: unable to access 'https://github.com/ehadsagency-ai/claude-code-memory.gi
 fatal: unable to access 'https://github.com/ehadsagency-ai/claude-code-memory.git/': Could not resolve host: github.com
 [2025-10-10 10:00:32] [0;31m❌ Failed to push to GitHub[0m
 [2025-10-10 10:00:32] [0;32m✅ Full sync completed[0m
+[2025-10-10 11:00:00] [0;34m🔄 Starting full bidirectional sync...[0m
+[2025-10-10 11:00:00] [0;34m📥 Pulling latest changes from GitHub...[0m
+fatal: unable to access 'https://github.com/ehadsagency-ai/claude-code-memory.git/': Could not resolve host: github.com
+[2025-10-10 11:00:11] [1;33m⬇️  Remote changes detected, pulling...[0m
+fatal: unable to access 'https://github.com/ehadsagency-ai/claude-code-memory.git/': Could not resolve host: github.com
+[2025-10-10 11:00:21] [0;31m❌ Failed to pull[0m
+[2025-10-10 11:00:21] [0;34m📤 Pushing local changes to GitHub...[0m
