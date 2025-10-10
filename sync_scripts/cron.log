@@ -1179,3 +1179,5 @@
 [2025-10-10 23:00:04] [0;32m✅ Pulled successfully[0m
 [2025-10-10 23:00:04] [0;34m📤 Pushing local changes to GitHub...[0m
 [2025-10-10 23:00:04] [0;32m✅ Committed locally[0m
+[2025-10-10 23:00:09] [0;31m❌ Failed to push to GitHub[0m
+[2025-10-10 23:00:09] [0;32m✅ Full sync completed[0m
