@@ -6324,3 +6324,43 @@ From https://github.com/ehadsagency-ai/claude-code-memory
 Already up to date.
 [2025-10-11 21:00:02] [0;32m✅ Pulled successfully[0m
 [2025-10-11 21:00:02] [0;34m📤 Pushing local changes to GitHub...[0m
+[main 58d2ffb] 🔄 Auto-sync: 2 file(s) updated
+ 2 files changed, 17 insertions(+)
+[2025-10-11 21:00:02] [0;32m✅ Committed locally[0m
+failed to store: -61
+remote: error: GH013: Repository rule violations found for refs/heads/main.        
+remote: 
+remote: - GITHUB PUSH PROTECTION        
+remote:   —————————————————————————————————————————        
+remote:     Resolve the following violations before pushing again        
+remote: 
+remote:     - Push cannot contain secrets        
+remote: 
+remote:             
+remote:      (?) Learn how to resolve a blocked push        
+remote:      https://docs.github.com/code-security/secret-scanning/working-with-secret-scanning-and-push-protection/working-with-push-protection-from-the-command-line#resolving-a-blocked-push        
+remote:             
+remote:             
+remote:       —— GitHub Personal Access Token ——————————————————————        
+remote:        locations:        
+remote:          - blob id: e148e595a0e41d50f902d409d6576e3e5a26d33c        
+remote:          - blob id: e148e595a0e41d50f902d409d6576e3e5a26d33c        
+remote:             
+remote:        (?) To push, remove secret from commit(s) or follow this URL to allow the secret.        
+remote:        https://github.com/ehadsagency-ai/claude-code-memory/security/secret-scanning/unblock-secret/33vBLJG8I9lQHHfgIqCpiBid1P9        
+remote:             
+remote:             
+remote:     ——[ WARNING ]—————————————————————————————————————————        
+remote:      Scan incomplete: This push was large and we didn't finish on time.        
+remote:      It can still contain undetected secrets.        
+remote:             
+remote:      (?) Use the following command to find the path of the detected secret(s):        
+remote:          git rev-list --objects --all | grep blobid        
+remote:     ——————————————————————————————————————————————————————        
+remote: 
+remote: 
+To https://github.com/ehadsagency-ai/claude-code-memory.git
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'https://github.com/ehadsagency-ai/claude-code-memory.git'
+[2025-10-11 21:00:08] [0;31m❌ Failed to push to GitHub[0m
+[2025-10-11 21:00:08] [0;32m✅ Full sync completed[0m
