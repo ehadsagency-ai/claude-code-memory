@@ -23,7 +23,7 @@
 
 ### 1. Compte GitHub
 - Organisation: `ehadsagency-ai`
-- Token déjà configuré: `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`
+- Token déjà configuré: `ghp_REMPLACER_PAR_VOTRE_JETON`
 
 ### 2. Compte GitBook.com
 - ⚠️ À CRÉER sur https://www.gitbook.com/
@@ -516,7 +516,7 @@ gh repo create ehadsagency-ai/data-analyst-course-docs \
 gh auth login
 # Choose: GitHub.com
 # Choose: HTTPS
-# Paste your token: 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
+# Paste your token: ghp_REMPLACER_PAR_VOTRE_JETON
 ```
 
 ### Push Magic_DevOps_Stick Docs
