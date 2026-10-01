@@ -23,7 +23,6 @@
 
 ### 1. Compte GitHub
 - Organisation: `ehadsagency-ai`
-- Token déjà configuré: `ghp_REMPLACER_PAR_VOTRE_JETON`
 
 ### 2. Compte GitBook.com
 - ⚠️ À CRÉER sur https://www.gitbook.com/
